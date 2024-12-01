@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"slices"
 	"sync"
 	"time"
 
@@ -37,16 +38,14 @@ func (b *BroadcastHandler) handleBroadcast(msg maelstrom.Message) error {
 
 	_, exists := b.seen.LoadOrStore(body.Message, struct{}{})
 
-	if !exists {
-		var errList []error
+	isNode := slices.Contains(b.node.NodeIDs(), msg.Src)
+
+	if !exists && !isNode {
 		neighbors := b.node.NodeIDs()
 		for _, n := range neighbors {
 			if n != msg.Src && n != b.node.ID() {
 				go b.handleShare(n, msg.Body)
 			}
-		}
-		if len(errList) > 0 {
-			return fmt.Errorf("received errors: %v", errList)
 		}
 	}
 
