@@ -24,7 +24,7 @@ func main() {
 		broadcast.RunSimple()
 
 	case "broadcast":
-		broadcast.RunMulti()
+		broadcast.RunMulti(true)
 
 	default:
 		log.Fatalf("Unexpected argument : %s", *name)
